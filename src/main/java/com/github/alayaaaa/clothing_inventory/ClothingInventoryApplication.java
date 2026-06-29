@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ClothingInventoryApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(ClothingInventoryApplication.class, args);
+
 	}
 
 }

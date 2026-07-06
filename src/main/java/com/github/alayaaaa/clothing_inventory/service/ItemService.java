@@ -1,5 +1,7 @@
 package com.github.alayaaaa.clothing_inventory.service;
 
+import com.github.alayaaaa.clothing_inventory.dto.ItemRequest;
+import com.github.alayaaaa.clothing_inventory.dto.ItemResponse;
 import com.github.alayaaaa.clothing_inventory.model.Item;
 import com.github.alayaaaa.clothing_inventory.repository.ItemRepository;
 import org.springframework.stereotype.Service;
@@ -23,28 +25,63 @@ public class ItemService {
 
     }
 
-    public Item addInventory(Item item) {
+    public ItemResponse addInventory(ItemRequest request) {
 
-        if (item.getQuantity() < 0) {
+        if (request.getQuantity() < 0) {
 
             throw new IllegalArgumentException("Quantity cannot be negative");
 
         }
 
-        return itemRepository.save(item);
+        Item item = mapToItem(request);
+        Item savedItem = itemRepository.save(item);
+
+        return mapToResponse(savedItem);
 
     }
 
-    public List<Item> getItemsByCategory(String category) {
+    private Item mapToItem(ItemRequest request) {
 
-        return itemRepository.findByCategory(category);
+        Item item = new Item();
+
+        item.setName(request.getName());
+        item.setCategory(request.getCategory());
+        item.setSize(request.getSize());
+        item.setQuantity(request.getQuantity());
+
+        return item;
 
     }
 
-    public Item getItemById(Long id) {
+    private ItemResponse mapToResponse(Item item) {
 
-        return itemRepository.findById(id)
+        ItemResponse response = new ItemResponse();
+
+        response.setId(item.getId());
+        response.setName(item.getName());
+        response.setCategory(item.getCategory());
+        response.setSize(item.getSize());
+        response.setQuantity(item.getQuantity());
+
+        return response;
+
+    }
+
+    public List<ItemResponse> getItemsByCategory(String category) {
+
+        return itemRepository.findByCategory(category)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+
+    }
+
+    public ItemResponse getItemById(Long id) {
+
+        Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Item not found with id " + id + "."));
+
+        return mapToResponse(item);
 
     }
 
